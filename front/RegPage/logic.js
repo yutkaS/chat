@@ -8,7 +8,7 @@ const nameInput = document.querySelector('.name');
 const submit = document.querySelector('.submit')
 
 submit.addEventListener('click', ()=>{
-    socket.send(JSON.stringify({addUser:{userName:nameInput.value, chat:select.value},}));
+
     const newLocalStorage = {chat:select.value, userName:nameInput.value,};
     localStorage.user = JSON.stringify(newLocalStorage)
     window.location.replace('http://localhost:8080/chat/')

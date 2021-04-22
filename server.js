@@ -4,18 +4,34 @@ const app = express();
 const server = require('http').createServer(app);
 const socketServer = new WebSocket.Server({server})
 app.use(express.json({type: () => true}));
-const { handlers } = require('./back/handleEvent')
+const { handlers, getWebSockets, getState } = require('./back/handleEvent');
 
 socketServer.on('connection', (ws) => {
+        // ws.send(JSON.stringify(getState()))
     ws.on('message' , (JSONData) => {
         const data = JSON.parse(JSONData);
         const keys = Object.keys(data);
+
         keys.forEach((key)=>{
             const dataInfo = data[key];
-            handlers[key](dataInfo.chat, dataInfo.userName, dataInfo.message);
+            const response = handlers[key](dataInfo.chat, dataInfo.userName, dataInfo.message ||  ws);
+
+            getWebSockets(dataInfo.chat).forEach((socket)=>{
+                if (!socket) return;
+                socket.send(JSON.stringify(response));
+            })
+        })
+    })
+    ws.on('close', ()=>{
+        const response = handlers.removeUser(ws);
+        if(!getWebSockets(response.chat)[0]) return
+        getWebSockets(response.chat).forEach((socket)=>{
+            socket.send(JSON.stringify(response.response));
         })
     })
 })
+
+
 
 
 

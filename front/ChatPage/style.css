@@ -1,5 +1,5 @@
 .message_container{
-
+    display: flex;
     margin: 0 auto;
 }
 
@@ -20,8 +20,30 @@ input{
     margin: 2px;
 }
 
-.users{
+.info{
     width: 150px;
     height: 500px;
-    background: purple;
+}
+
+button{
+    margin: 5px;
+}
+
+h2{
+    text-align: center;
+}
+
+.message {
+    display: flex;
+    margin: 5px;
+}
+
+.autor {
+    color: #ff4d4d;
+
+}
+
+.text {
+    background: #490909;
+    color: #4d4dff;
 }
