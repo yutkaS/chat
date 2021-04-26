@@ -7,7 +7,6 @@ const createHandlersObj = (...handlers) => {
         const keys = Object.keys(e);
         keys.forEach((key)=>{
             const newObj = {};
-
             newObj[key] = e[key];
             Object.assign(obj, newObj);
         })

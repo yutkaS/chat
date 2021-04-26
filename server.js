@@ -9,24 +9,39 @@ const {untils} = require('./back/untils');
 
 socketServer.on('connection', (ws) => {
     ws.on('message', (JSONData) => {
+
+
         const data = JSON.parse(JSONData);
         const keys = Object.keys(data);
-
         keys.forEach((key) => {
             const dataInfo = data[key];
             if (key === 'addUser') {
-                const users = handlers.addUser(dataInfo.chat, dataInfo.userName, ws);
-                untils.getWebSockets(dataInfo.chat).forEach((socket) => {
-                    if (!socket) return;
-                    socket.send(JSON.stringify(users));
+                const defaultState = handlers.getDefaultState( ws, dataInfo.chat, dataInfo.userName);
+
+                untils.getWebSockets(dataInfo.chat).forEach((ws) => {
+
+                    ws.send(JSON.stringify(defaultState));
                 })
-                return
+                return;
             }
+            if (key === 'changeChat') {
+                handlers.changeChat(ws)
+                let user =  untils.getUserByWs(ws);
+
+                const pastChat = user.chat
+
+                let response = JSON.stringify(Object.assign(untils.getUserState(pastChat),{chatName:pastChat,}));
+                untils.getWebSockets(pastChat).forEach((socket) => socket.send(response));
+                response = JSON.stringify(Object.assign(untils.getUserState(user.chat), {chatName:user.chat,}));
+                untils.getWebSockets(user.chat).forEach((socket)=> socket.send(response))
+                return;
+            }
+
             const user = untils.getUserByWs(ws);
-            const response = handlers[key](user.chat, user.userName, dataInfo.message || ws);
-            untils.getWebSockets(dataInfo.chat).forEach((socket) => {
-                if (!socket) return;
-                socket.send(JSON.stringify(response));
+            const response = handlers[key](ws, dataInfo.message  );
+            untils.getWebSockets(user.chat).forEach((ws) => {
+                if (!ws) return
+                ws.send(JSON.stringify(response))
             })
         })
     })

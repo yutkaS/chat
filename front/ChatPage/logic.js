@@ -1,17 +1,13 @@
 const socket = new WebSocket(`ws://192.168.0.200:8080`);
 const sendButton = document.querySelector('.send_button');
 const messageInput = document.querySelector('input');
-const storage = JSON.parse(localStorage.user);
 const users = document.querySelector('.users');
 const beforeButton = document.querySelector('.before_button');
 const afterButton = document.querySelector('.after_button');
 const chatName = document.querySelector('.chat_name');
 const messages = document.querySelector('.messages');
 
-const changeChat = (chat) => {
-    const changeRequest = {changeChat:{chat:chat}};
-    return JSON.stringify(changeRequest);
-}
+
 
 socket.onopen = () => {
     console.log('открыл сокет');
@@ -19,17 +15,11 @@ socket.onopen = () => {
 }
 
 beforeButton.addEventListener('click', ()=>{
-    let newLocalStorage = {chat:'before', userName:JSON.parse(localStorage.user).userName};
-    console.log('я охуею если это работает');
-    localStorage.user = JSON.stringify(newLocalStorage);
-    socket.send(changeChat(newLocalStorage.chat))
+    socket.send(JSON.stringify({changeChat:'',}))
 })
 
 afterButton.addEventListener('click', ()=>{
-    let newLocalStorage = {chat:'after', userName:JSON.parse(localStorage.user).userName};
-    console.log('я охуею если это работает');
-    localStorage.user = JSON.stringify(newLocalStorage);
-    socket.send(changeChat(newLocalStorage.chat))
+    socket.send(JSON.stringify({changeChat:'',}))
 })
 
 let state = {

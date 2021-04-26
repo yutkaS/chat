@@ -1,29 +1,45 @@
 const {untils} = require('../untils');
 const state = untils.getState();
 
-module.exports.userHandlers = {
-    addUser: (chat, user, ws) => {
-        user = {userName: user, ws: ws};
-        state.chats[chat].users.push(user);
-        return untils.getNames(chat);
-    },
-    removeUser: (ws) => {
-        let activeChat;
-        for (let chat = 'before'; chat !== 'after'; chat = 'after') {
-            activeChat = chat;
-            const clients = state.chats[chat].users;
-            untils.getWebSockets(chat).forEach((e, i) => {
-                if (e === ws) clients.splice(i, 1);
-            });
-        }
-        return {chat:activeChat, response:untils.getNames(activeChat)};
-    },
-    changeChat: (newChat, zero, ws) => {
-        const chat = newChat === 'before' ? 'after' : 'before';
-        const clients = state.chats[chat].users;
-        state.chats[chat].users.forEach((e, i) => {
-            if (e.ws === ws) clients.splice(i, 1);
-            addUser(newChat, e.userName, ws);
-        });
-    },
+
+getDefaultState = (ws, chat, user, ) => {
+    user = {userName: user, ws: ws};
+    state.chats[chat].users.push(user);
+    const messages = state.chats[chat].messages;
+    const users = untils.getNames(chat);
+
+    return {messages: messages, users: users,};
 }
+
+removeUser = (ws) => {
+    let chat
+    let clients = state.chats['before'].users;
+    untils.getWebSockets('before').forEach((e, i) => {
+        if (e === ws) {clients.splice(i, 1); chat = 'after'}
+    });
+
+    clients = state.chats['after'].users;
+    untils.getWebSockets('after').forEach((e, i) => {
+        if (e === ws){ clients.splice(i, 1);  chat = 'after'};
+    });
+
+    return {chat: chat, response: untils.getNames(chat)};
+}
+const changeChat = (ws) => {
+    console.log(state.chats, 'beforeChanges');
+   const user = untils.getUserByWs(ws);
+   const chat = user.chat === 'before' ? 'after' : 'before';
+    removeUser(ws);
+    console.log(state.chats, 'afterRemove');
+    const bebe = getDefaultState(ws, chat, user.userName);
+    console.log(state.chats, 'afterAdd');
+
+    return bebe;
+}
+
+// setInterval(()=>{
+//     console.log(state.chats.before.users, 'before');
+//     console.log(state.chats.after.users, 'after');
+// },100)
+
+module.exports.userHandlers = {changeChat: changeChat, removeUser: removeUser, getDefaultState: getDefaultState,}

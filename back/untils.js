@@ -5,13 +5,16 @@ const state = {
     },
 };
 
+
 const getState = () => state;
 
 const getWebSockets = (chat) => {
     const sockets = [];
     state.chats[chat].users.forEach((e) => {
+
         sockets.push(e.ws);
     })
+
     return sockets
 }
 
@@ -20,27 +23,34 @@ const getNames = (chat) => {
     state.chats[chat].users.forEach((e) => {
         names.push(e.userName);
     })
-    return {users: names};
+    return names;
 }
 
 const getUserState = (chat) => {
-
+    const response = {users:[], messages:[],};
+    state.chats[chat].messages.forEach((e) => {
+        response.messages.push(e)
+    })
+    response.users.push(getNames(chat));
+    return response
 };
 
 const getUserByWs = (ws) => {
-    let user = {};
-    let usableChat = '';
-    for (let chat = 'before'; chat !== 'after'; chat = 'after') {
-        usableChat = chat;
-        state.chats[usableChat].users.forEach((e) => {
-            if (e.ws === ws) {
+    let response;
 
-                user = e;
-            }
-        })
-    }
-
-    return Object.assign(user, {chat:usableChat});
+    let chat = 'before';
+    state.chats[chat].users.forEach((e) => {
+        if (e.ws === ws) {
+            response = Object.assign(e, {chat: chat})
+        }
+    })
+    if (!response) chat = 'after';
+    state.chats[chat].users.forEach((e) => {
+        if (e.ws === ws) {
+            response = Object.assign(e, {chat: chat})
+        }
+    })
+    return response;
 }
 
 module.exports.untils = {
