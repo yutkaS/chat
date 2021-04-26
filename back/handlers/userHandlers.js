@@ -8,20 +8,16 @@ const addUser = (ws, data) => {
     state.chats[chat].users.push(user);
     const users = untils.getNames(chat);
     const messages = state.chats[chat].messages;
-
-
     return {messages: messages, users: users, chatName: chat,};
 }
 
-const removeUser = (user, chat) => {
-
+const removeUser = (removableUser, chat) => {
     let users = state.chats[chat].users;
-    const i = users.indexOf(user);
-    console.log(user, 'user!!');
-    console.log(users, i);
-
-    users.splice(i, 1);
-
+    users.forEach((user, i) => {
+        if (user.userName === removableUser.userName) {
+            users.splice(i, 1);
+        }
+    })
 
     return {users: untils.getNames(chat)};
 }
@@ -30,7 +26,6 @@ const changeChat = (ws) => {
     const user = untils.getUserByWs(ws);
     const pastChat = user.chat;
     const newChat = pastChat === 'before' ? 'after' : 'before';
-
     removeUser(user, pastChat);
     return addUser(ws, {chat: newChat, userName: user.userName});
 }

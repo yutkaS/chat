@@ -16,22 +16,21 @@ socketServer.on('connection', (ws) => {
         keys.forEach((key) => {
             const dataInfo = data[key];
             if (key === 'changeChat') {
+
                 handlers.changeChat(ws);
 
-
-                let responseForBefore = JSON.stringify(untils.getUserState('before'));
+                let responseForBefore = JSON.stringify(untils.getClientState('before'));
                 untils.getWebSockets('before').forEach((socket) => socket.send(responseForBefore));
 
-                let responseForAfter = JSON.stringify(untils.getUserState('after'));
+                let responseForAfter = JSON.stringify(untils.getClientState('after'));
                 untils.getWebSockets('after').forEach((socket) => socket.send(responseForAfter))
-
+                console.log('sending successfully');
                 return;
             }
 
             const response = handlers[key](ws, dataInfo);
             const user = untils.getUserByWs(ws);
             untils.getWebSockets(user.chat).forEach((ws) => {
-                if (!ws) return;
                 ws.send(JSON.stringify(response));
             })
         })

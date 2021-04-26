@@ -17,5 +17,5 @@ const createHandlersObj = (...handlers) => {
 
 const handlers = createHandlersObj(userHandlers, chatHandlers);
 
-module.exports.handlers = handlers
+module.exports.handlers = handlers;
 
