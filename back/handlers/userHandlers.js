@@ -2,42 +2,38 @@ const {untils} = require('../untils');
 const state = untils.getState();
 
 
-getDefaultState = (ws, chat, user, ) => {
-    user = {userName: user, ws: ws};
+const addUser = (ws, data) => {
+    const chat = data.chat;
+    const user = {userName: data.userName, ws: ws};
     state.chats[chat].users.push(user);
-    const messages = state.chats[chat].messages;
     const users = untils.getNames(chat);
+    const messages = state.chats[chat].messages;
 
-    return {messages: messages, users: users, chatName:chat,};
+
+    return {messages: messages, users: users, chatName: chat,};
 }
 
-removeUser = (ws) => {
-    let chat
-    let clients = state.chats['before'].users;
-    untils.getWebSockets('before').forEach((e, i) => {
-        if (e === ws) {clients.splice(i, 1); chat = 'after'}
-    });
+const removeUser = (user, chat) => {
 
-    clients = state.chats['after'].users;
-    untils.getWebSockets('after').forEach((e, i) => {
-        if (e === ws){ clients.splice(i, 1);  chat = 'after'};
-    });
+    let users = state.chats[chat].users;
+    const i = users.indexOf(user);
+    console.log(user, 'user!!');
+    console.log(users, i);
 
-    return {chat: chat, response: untils.getNames(chat)};
+    users.splice(i, 1);
+
+
+    return {users: untils.getNames(chat)};
 }
+
 const changeChat = (ws) => {
-    console.log('CHANGE CHAT');
     const user = untils.getUserByWs(ws);
-   const chat = user.chat === 'before' ? 'after' : 'before';
-    removeUser(ws);
-    const response = getDefaultState(ws, chat, user.userName);
+    const pastChat = user.chat;
+    const newChat = pastChat === 'before' ? 'after' : 'before';
 
-    return response;
+    removeUser(user, pastChat);
+    return addUser(ws, {chat: newChat, userName: user.userName});
 }
 
-// setInterval(()=>{
-//     console.log(state.chats.before.users, 'before');
-//     console.log(state.chats.after.users, 'after');
-// },100)
 
-module.exports.userHandlers = {changeChat: changeChat, removeUser: removeUser, getDefaultState: getDefaultState,}
+module.exports.userHandlers = {changeChat: changeChat, removeUser: removeUser, addUser: addUser,}

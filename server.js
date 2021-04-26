@@ -15,45 +15,33 @@ socketServer.on('connection', (ws) => {
         const keys = Object.keys(data);
         keys.forEach((key) => {
             const dataInfo = data[key];
-            if (key === 'addUser') {
-                const defaultState = handlers.getDefaultState(ws, dataInfo.chat, dataInfo.userName);
-
-                untils.getWebSockets(dataInfo.chat).forEach((ws) => {
-
-                    ws.send(JSON.stringify(defaultState));
-                })
-                return;
-            }
             if (key === 'changeChat') {
-                const userState = handlers.changeChat(ws);
-                let user = untils.getUserByWs(ws);
+                handlers.changeChat(ws);
 
-                const chat = user.chat
 
-                let response = JSON.stringify({users: untils.getNames('before')});
-                console.log(response, 'beforeResponse');
-                untils.getWebSockets('before').forEach((socket) => socket.send(response));
-                response = JSON.stringify({users: untils.getNames('after')});
-                untils.getWebSockets('after').forEach((socket) => socket.send(response))
-                response = JSON.stringify(userState);
+                let responseForBefore = JSON.stringify(untils.getUserState('before'));
+                untils.getWebSockets('before').forEach((socket) => socket.send(responseForBefore));
 
-                ws.send(response);
+                let responseForAfter = JSON.stringify(untils.getUserState('after'));
+                untils.getWebSockets('after').forEach((socket) => socket.send(responseForAfter))
+
                 return;
             }
 
+            const response = handlers[key](ws, dataInfo);
             const user = untils.getUserByWs(ws);
-            const response = handlers[key](ws, dataInfo.message);
             untils.getWebSockets(user.chat).forEach((ws) => {
-                if (!ws) return
-                ws.send(JSON.stringify(response))
+                if (!ws) return;
+                ws.send(JSON.stringify(response));
             })
         })
     })
     ws.on('close', () => {
-        const response = handlers.removeUser(ws);
-        if (!untils.getWebSockets(response.chat)[0]) return
-        untils.getWebSockets(response.chat).forEach((socket) => {
-            socket.send(JSON.stringify(response.response));
+        const removableUser = untils.getUserByWs(ws);
+        const chat = removableUser.chat;
+        const users = handlers.removeUser(removableUser, chat);
+        untils.getWebSockets(chat).forEach((socket) => {
+            socket.send(JSON.stringify(users));
         })
     })
 })
