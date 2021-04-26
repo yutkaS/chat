@@ -16,7 +16,7 @@ socketServer.on('connection', (ws) => {
         keys.forEach((key) => {
             const dataInfo = data[key];
             if (key === 'addUser') {
-                const defaultState = handlers.getDefaultState( ws, dataInfo.chat, dataInfo.userName);
+                const defaultState = handlers.getDefaultState(ws, dataInfo.chat, dataInfo.userName);
 
                 untils.getWebSockets(dataInfo.chat).forEach((ws) => {
 
@@ -25,20 +25,24 @@ socketServer.on('connection', (ws) => {
                 return;
             }
             if (key === 'changeChat') {
-                handlers.changeChat(ws)
-                let user =  untils.getUserByWs(ws);
+                const userState = handlers.changeChat(ws);
+                let user = untils.getUserByWs(ws);
 
-                const pastChat = user.chat
+                const chat = user.chat
 
-                let response = JSON.stringify(Object.assign(untils.getUserState(pastChat),{chatName:pastChat,}));
-                untils.getWebSockets(pastChat).forEach((socket) => socket.send(response));
-                response = JSON.stringify(Object.assign(untils.getUserState(user.chat), {chatName:user.chat,}));
-                untils.getWebSockets(user.chat).forEach((socket)=> socket.send(response))
+                let response = JSON.stringify({users: untils.getNames('before')});
+                console.log(response, 'beforeResponse');
+                untils.getWebSockets('before').forEach((socket) => socket.send(response));
+                response = JSON.stringify({users: untils.getNames('after')});
+                untils.getWebSockets('after').forEach((socket) => socket.send(response))
+                response = JSON.stringify(userState);
+
+                ws.send(response);
                 return;
             }
 
             const user = untils.getUserByWs(ws);
-            const response = handlers[key](ws, dataInfo.message  );
+            const response = handlers[key](ws, dataInfo.message);
             untils.getWebSockets(user.chat).forEach((ws) => {
                 if (!ws) return
                 ws.send(JSON.stringify(response))

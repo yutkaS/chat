@@ -8,7 +8,7 @@ getDefaultState = (ws, chat, user, ) => {
     const messages = state.chats[chat].messages;
     const users = untils.getNames(chat);
 
-    return {messages: messages, users: users,};
+    return {messages: messages, users: users, chatName:chat,};
 }
 
 removeUser = (ws) => {
@@ -26,15 +26,13 @@ removeUser = (ws) => {
     return {chat: chat, response: untils.getNames(chat)};
 }
 const changeChat = (ws) => {
-    console.log(state.chats, 'beforeChanges');
-   const user = untils.getUserByWs(ws);
+    console.log('CHANGE CHAT');
+    const user = untils.getUserByWs(ws);
    const chat = user.chat === 'before' ? 'after' : 'before';
     removeUser(ws);
-    console.log(state.chats, 'afterRemove');
-    const bebe = getDefaultState(ws, chat, user.userName);
-    console.log(state.chats, 'afterAdd');
+    const response = getDefaultState(ws, chat, user.userName);
 
-    return bebe;
+    return response;
 }
 
 // setInterval(()=>{
