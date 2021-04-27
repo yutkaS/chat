@@ -22,12 +22,10 @@ const removeUser = (removableUser, chat) => {
     return {users: untils.getNames(chat)};
 }
 
-const changeChat = (ws) => {
-    const user = untils.getUserByWs(ws);
+const changeChat = (user, newChat) => {
     const pastChat = user.chat;
-    const newChat = pastChat === 'before' ? 'after' : 'before';
     removeUser(user, pastChat);
-    return addUser(ws, {chat: newChat, userName: user.userName});
+    return addUser(user.ws, {chat: newChat, userName: user.userName});
 }
 
 

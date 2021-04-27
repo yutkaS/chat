@@ -16,8 +16,8 @@ socketServer.on('connection', (ws) => {
         keys.forEach((key) => {
             const dataInfo = data[key];
             if (key === 'changeChat') {
-
-                handlers.changeChat(ws);
+                const user = untils.getUserByWs(ws);
+                handlers.changeChat(user, dataInfo);
 
                 let responseForBefore = JSON.stringify(untils.getClientState('before'));
                 untils.getWebSockets('before').forEach((socket) => socket.send(responseForBefore));

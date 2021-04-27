@@ -15,11 +15,11 @@ socket.onopen = () => {
 }
 
 beforeButton.addEventListener('click', ()=>{
-    socket.send(JSON.stringify({changeChat:'',}))
+    socket.send(JSON.stringify({changeChat:'before',}))
 })
 
 afterButton.addEventListener('click', ()=>{
-    socket.send(JSON.stringify({changeChat:'',}))
+    socket.send(JSON.stringify({changeChat:'after',}))
 })
 
 let state = {
