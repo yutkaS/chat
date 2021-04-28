@@ -41,10 +41,12 @@ const render = () => {
     }
 
     for(let i = 0 ; i < state.messages.length ; i++){
-        const autor = Object.keys(state.messages[i])
-        chatHTML += `<div class="message"> <div class="autor">${autor}:</div> <div class="text">${state.messages[i][autor]}</div> </div>`
+        const autor = Object.keys(state.messages[i]);
+        chatHTML += `<div class="message">
+                        <div class="autor">${autor}:</div> 
+                        <div class="text">${state.messages[i][autor]}</div> 
+                     </div>`
     }
-
 
     messages.innerHTML = chatHTML;
     users.innerHTML = userHTML;
@@ -57,8 +59,7 @@ chatName.innerHTML = state.chatName;
 
 
 sendButton.addEventListener('click', ()=>{
-    console.log(localStorage.user);
-    socket.send(JSON.stringify({addMessage:{ chat:JSON.parse(localStorage.user).chat, userName:JSON.parse(localStorage.user).userName, message:messageInput.value,}}));
+    socket.send(JSON.stringify({addMessage:{message:messageInput.value,}}));
 });
 
 
