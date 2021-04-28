@@ -49,11 +49,6 @@ const render = () => {
                      </div>`
     })
 
-    for(let i = 0 ; i < state.messages.length ; i++){
-
-
-    }
-
     messages.innerHTML = chatHTML;
     users.innerHTML = userHTML;
     chatName.innerHTML = state.chatName;
