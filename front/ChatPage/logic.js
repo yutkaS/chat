@@ -6,12 +6,12 @@ const beforeButton = document.querySelector('.before_button');
 const afterButton = document.querySelector('.after_button');
 const chatName = document.querySelector('.chat_name');
 const messages = document.querySelector('.messages');
-
+const storage = JSON.parse(localStorage.user)
 
 
 socket.onopen = () => {
     console.log('открыл сокет');
-    socket.send(JSON.stringify({addUser:{userName:JSON.parse(localStorage.user).userName, chat:JSON.parse(localStorage.user).chat},}));
+    socket.send(JSON.stringify({addUser:{userName:storage.userName, chat:storage.chat},}));
 }
 
 beforeButton.addEventListener('click', ()=>{
@@ -36,16 +36,22 @@ const setState = (data) => {
 const render = () => {
     let chatHTML = '';
     let userHTML = '';
-    for (let i = 0 ; i < state.users.length ; i++){
-        userHTML += `<div>${state.users[i]}</div>`;
-    }
+
+    state.users.forEach((e) => {
+        userHTML += `<div>${e}</div>`;
+    })
+
+    state.messages.forEach((e) => {
+        const sender = Object.keys(e)[0];
+        chatHTML += `<div class="message">
+                        <div class="autor">${sender}:</div> 
+                        <div class="text">${e[sender]}</div> 
+                     </div>`
+    })
 
     for(let i = 0 ; i < state.messages.length ; i++){
-        const autor = Object.keys(state.messages[i]);
-        chatHTML += `<div class="message">
-                        <div class="autor">${autor}:</div> 
-                        <div class="text">${state.messages[i][autor]}</div> 
-                     </div>`
+
+
     }
 
     messages.innerHTML = chatHTML;
